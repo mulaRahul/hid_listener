@@ -12,11 +12,13 @@ import 'dart:ffi' as ffi;
 abstract class MouseEventType {
   static const int LeftButtonDown = 0;
   static const int LeftButtonUp = 1;
-  static const int RightButtonDown = 2;
-  static const int RightButtonUp = 3;
-  static const int MouseMove = 4;
-  static const int MouseWheel = 5;
-  static const int MouseHorizontalWheel = 6;
+  static const int MiddleButtonDown = 2;
+  static const int MiddleButtonUp = 3;
+  static const int RightButtonDown = 4;
+  static const int RightButtonUp = 5;
+  static const int MouseMove = 6;
+  static const int MouseWheel = 7;
+  static const int MouseHorizontalWheel = 8;
 }
 
 final class MouseEvent extends ffi.Struct {

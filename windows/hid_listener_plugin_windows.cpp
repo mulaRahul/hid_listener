@@ -63,6 +63,10 @@ static LRESULT MouseProc(int nCode, WPARAM wParam, LPARAM lParam) {
 		eventType = MouseEventType::MouseWheel;
 	} else if (wParam == WM_MOUSEHWHEEL) {
 		eventType = MouseEventType::MouseHorizontalWheel;
+	} else if (wParam == WM_MBUTTONUP) {
+		eventType = MouseEventType::MiddleButtonUp;
+	} else if (wParam == WM_MBUTTONDOWN) {
+		eventType = MouseEventType::MiddleButtonDown;
 	}
 
 	MSLLHOOKSTRUCT* info = reinterpret_cast<MSLLHOOKSTRUCT*>(lParam);

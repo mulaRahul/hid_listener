@@ -139,6 +139,12 @@ void HidListener::WorkerThread() {
                         } else if (cookie->evtype == XI_RawButtonRelease) {
                             mouseEvent->eventType = MouseEventType::LeftButtonUp;
                         }
+                    } else if (rawEvent->detail == 2) {
+                        if (cookie->evtype == XI_RawButtonPress) {
+                            mouseEvent->eventType = MouseEventType::MiddleButtonDown;
+                        } else if (cookie->evtype == XI_RawButtonRelease) {
+                            mouseEvent->eventType = MouseEventType::MiddleButtonUp;
+                        }
                     } else if (rawEvent->detail == 3) {
                         if (cookie->evtype == XI_RawButtonPress) {
                             mouseEvent->eventType = MouseEventType::RightButtonDown;

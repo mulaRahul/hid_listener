@@ -29,6 +29,18 @@ MouseEvent? mouseProc(dynamic event) {
         x: eventAddr.ref.x,
         y: eventAddr.ref.y,
         type: MouseButtonEventType.rightButtonUp);
+  } else if (eventAddr.ref.eventType ==
+      bindings.MouseEventType.MiddleButtonDown) {
+    mouseEvent = MouseButtonEvent(
+        x: eventAddr.ref.x,
+        y: eventAddr.ref.y,
+        type: MouseButtonEventType.middleButtonDown);
+  } else if (eventAddr.ref.eventType ==
+      bindings.MouseEventType.MiddleButtonUp) {
+    mouseEvent = MouseButtonEvent(
+        x: eventAddr.ref.x,
+        y: eventAddr.ref.y,
+        type: MouseButtonEventType.middleButtonUp);
   } else if (eventAddr.ref.eventType == bindings.MouseEventType.MouseMove) {
     mouseEvent = MouseMoveEvent(x: eventAddr.ref.x, y: eventAddr.ref.y);
   } else if (eventAddr.ref.eventType == bindings.MouseEventType.MouseWheel ||

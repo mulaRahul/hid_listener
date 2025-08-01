@@ -104,26 +104,30 @@ func mouseEventCallback(
 
   mouseEvent.pointee.x = mouseLoc.x
   mouseEvent.pointee.y = mouseLoc.y
-
+    
   if type == .leftMouseDown {
     mouseEvent.pointee.eventType = MouseEventType(0)
   } else if type == .leftMouseUp {
     mouseEvent.pointee.eventType = MouseEventType(1)
-  } else if type == .rightMouseDown {
+  } else if type == .otherMouseDown {
     mouseEvent.pointee.eventType = MouseEventType(2)
-  } else if type == .rightMouseUp {
+  } else if type == .otherMouseUp {
     mouseEvent.pointee.eventType = MouseEventType(3)
-  } else if type == .mouseMoved || type == .leftMouseDragged || type == .rightMouseDragged {
+  } else if type == .rightMouseDown {
     mouseEvent.pointee.eventType = MouseEventType(4)
+  } else if type == .rightMouseUp {
+    mouseEvent.pointee.eventType = MouseEventType(5)
+  } else if type == .mouseMoved || type == .leftMouseDragged || type == .rightMouseDragged {
+    mouseEvent.pointee.eventType = MouseEventType(6)
   } else if type == .scrollWheel {
     let verticalScroll = event.getIntegerValueField(.scrollWheelEventDeltaAxis1)
     let horizontalScroll = event.getIntegerValueField(.scrollWheelEventDeltaAxis2)
 
     if verticalScroll != 0 {
-      mouseEvent.pointee.eventType = MouseEventType(5)
+      mouseEvent.pointee.eventType = MouseEventType(7)
       mouseEvent.pointee.wheelDelta = verticalScroll
     } else if horizontalScroll != 0 {
-      mouseEvent.pointee.eventType = MouseEventType(6)
+      mouseEvent.pointee.eventType = MouseEventType(8)
       mouseEvent.pointee.wheelDelta = horizontalScroll
     }
   }
@@ -170,11 +174,11 @@ public class HidListener {
       return false
     }
 
-    let mouseEventMask =
-      (1 << CGEventType.leftMouseDown.rawValue) | (1 << CGEventType.leftMouseUp.rawValue) |
-      (1 << CGEventType.rightMouseDown.rawValue) | (1 << CGEventType.rightMouseUp.rawValue) |
-      (1 << CGEventType.mouseMoved.rawValue) | (1 << CGEventType.scrollWheel.rawValue) |
-      (1 << CGEventType.leftMouseDragged.rawValue) | (1 << CGEventType.rightMouseDragged.rawValue)
+    let mouseButtonEvents = (1 << CGEventType.leftMouseDown.rawValue) | (1 << CGEventType.leftMouseUp.rawValue) | (1 << CGEventType.rightMouseDown.rawValue) | (1 << CGEventType.rightMouseUp.rawValue) | (1 << CGEventType.otherMouseDown.rawValue) | (1 << CGEventType.otherMouseUp.rawValue)
+    let mouseMoveEvents = (1 << CGEventType.mouseMoved.rawValue) | (1 << CGEventType.scrollWheel.rawValue)
+    let mouseDragEvents = (1 << CGEventType.leftMouseDragged.rawValue) | (1 << CGEventType.rightMouseDragged.rawValue)
+    
+    let mouseEventMask = mouseButtonEvents | mouseMoveEvents | mouseDragEvents
 
     guard
       let mouseEventTap = CGEvent.tapCreate(

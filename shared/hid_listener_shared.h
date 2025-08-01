@@ -38,6 +38,8 @@ enum MouseEventType
 {
     LeftButtonDown,
     LeftButtonUp,
+    MiddleButtonDown,
+    MiddleButtonUp,
     RightButtonDown,
     RightButtonUp,
     MouseMove,
