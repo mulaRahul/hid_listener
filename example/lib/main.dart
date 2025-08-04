@@ -10,9 +10,10 @@ void listener(RawKeyEvent event) {
 void mouseListener(MouseEvent event) {
   if (event is MouseButtonEvent) {
     print("Button: ${event.type} (${event.x}, ${event.y})");
-  } else {
-    print("Button: $event (${event.x}, ${event.y})");
   }
+  // else {
+  //   print("Button: $event (${event.x}, ${event.y})");
+  // }
 }
 
 var registerResult = "";
@@ -22,7 +23,7 @@ void main() {
     print("Failed to initialize listener backend");
   }
 
-  // getListenerBackend()!.addKeyboardListener(listener);
+  getListenerBackend()!.addKeyboardListener(listener);
   getListenerBackend()!.addMouseListener(mouseListener);
 
   runApp(const MyApp());

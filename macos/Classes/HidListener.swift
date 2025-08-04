@@ -11,35 +11,39 @@ func keyboardEventCallback(
   proxy _: CGEventTapProxy, type: CGEventType, event: CGEvent, _: UnsafeMutableRawPointer?
 ) -> Unmanaged<CGEvent>? {
   DispatchQueue.main.async {
-    if let nsEvent = NSEvent(cgEvent: event) {
-      let eventType = {
-        if type == .flagsChanged {
-          return prevFlags < event.flags.rawValue ? MacOsKeyboardEventType.KeyDown : MacOsKeyboardEventType.KeyUp
-        } else if type == .keyDown {
-          return MacOsKeyboardEventType.KeyDown
-        }
-        return MacOsKeyboardEventType.KeyUp
-      }()
+    guard let nsEvent = NSEvent(cgEvent: event) else { return }
+    let eventType: MacOsKeyboardEventType = {
+      if type == .flagsChanged {
+        return prevFlags < event.flags.rawValue ? .KeyDown : .KeyUp
+      } else if type == .keyDown {
+        return .KeyDown
+      }
+      return .KeyUp
+    }()
 
-      let characters = nsEvent.characters ?? " "
-      let charactersIgnoringModifiers = nsEvent.charactersIgnoringModifiers ?? " "
-      let keyCode = Int(nsEvent.keyCode)
-      let modifiers = Int(nsEvent.modifierFlags.rawValue)
-      let keyboardEvent = Unmanaged<MacOsKeyboardEvent>.passRetained(MacOsKeyboardEvent(
-        eventType: eventType,
-        characters: characters,
-        charactersIgnoringModifiers: charactersIgnoringModifiers,
-        keyCode: keyCode,
-        modifiers: modifiers,
-        isMedia: false,
-        mediaEventType: MacOsMediaEventType.Play
-      ))
+    let (characters, charactersIgnoringModifiers, keyCode): (String, String, Int) = {
+      if type == .flagsChanged {
+        // Modifier keys: characters may be nil or empty, keyCode is valid
+        return ("", "", Int(nsEvent.keyCode))
+      } else {
+        return (nsEvent.characters ?? " ", nsEvent.charactersIgnoringModifiers ?? " ", Int(nsEvent.keyCode))
+      }
+    }()
+    let modifiers = Int(nsEvent.modifierFlags.rawValue)
+    let keyboardEvent = Unmanaged<MacOsKeyboardEvent>.passRetained(MacOsKeyboardEvent(
+      eventType: eventType,
+      characters: characters,
+      charactersIgnoringModifiers: charactersIgnoringModifiers,
+      keyCode: keyCode,
+      modifiers: modifiers,
+      isMedia: false,
+      mediaEventType: MacOsMediaEventType.Play
+    ))
 
-      let pointerEvent = UnsafeMutablePointer<MacOsKeyboardEvent>.allocate(capacity: 1)
-      pointerEvent.initialize(to: keyboardEvent.takeRetainedValue())
+    let pointerEvent = UnsafeMutablePointer<MacOsKeyboardEvent>.allocate(capacity: 1)
+    pointerEvent.initialize(to: keyboardEvent.takeRetainedValue())
 
-      notifyDart(port: keyboardListenerPort, data: pointerEvent)
-    }
+    notifyDart(port: keyboardListenerPort, data: pointerEvent)
   }
 
   return Unmanaged.passRetained(event)
@@ -154,7 +158,8 @@ public class HidListener {
   public func initialize() -> Bool {
     let keyboardEventMask =
       (1 << CGEventType.keyDown.rawValue)
-        | (1 << CGEventType.keyUp.rawValue)
+      | (1 << CGEventType.keyUp.rawValue)
+      | (1 << CGEventType.flagsChanged.rawValue)
 
     guard
       let keyboardEventTap = CGEvent.tapCreate(
